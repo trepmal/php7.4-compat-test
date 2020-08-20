@@ -36,7 +36,7 @@ class WPSEO_Taxonomy_Meta extends WPSEO_Option {
 	 *
 	 * @var array
 	 */
-	protected $defaults = [];
+	protected $defaults = array();
 
 	/**
 	 * Option name - same as $option_name property, but now also available to static methods.
@@ -50,7 +50,7 @@ class WPSEO_Taxonomy_Meta extends WPSEO_Option {
 	 *
 	 * @var array
 	 */
-	public static $defaults_per_term = [
+	public static $defaults_per_term = array(
 		'wpseo_title'                 => '',
 		'wpseo_desc'                  => '',
 		'wpseo_canonical'             => '',
@@ -61,7 +61,6 @@ class WPSEO_Taxonomy_Meta extends WPSEO_Option {
 		'wpseo_content_score'         => '',
 		'wpseo_focuskeywords'         => '[]',
 		'wpseo_keywordsynonyms'       => '[]',
-		'wpseo_is_cornerstone'        => '0',
 
 		// Social fields.
 		'wpseo_opengraph-title'       => '',
@@ -72,7 +71,7 @@ class WPSEO_Taxonomy_Meta extends WPSEO_Option {
 		'wpseo_twitter-description'   => '',
 		'wpseo_twitter-image'         => '',
 		'wpseo_twitter-image-id'      => '',
-	];
+	);
 
 	/**
 	 * Available index options.
@@ -83,11 +82,11 @@ class WPSEO_Taxonomy_Meta extends WPSEO_Option {
 	 *
 	 * @var array
 	 */
-	public static $no_index_options = [
+	public static $no_index_options = array(
 		'default' => '',
 		'index'   => '',
 		'noindex' => '',
-	];
+	);
 
 	/**
 	 * Add the actions and filters for the option.
@@ -95,6 +94,8 @@ class WPSEO_Taxonomy_Meta extends WPSEO_Option {
 	 * @todo [JRF => testers] Check if the extra actions below would run into problems if an option
 	 * is updated early on and if so, change the call to schedule these for a later action on add/update
 	 * instead of running them straight away.
+	 *
+	 * @return \WPSEO_Taxonomy_Meta
 	 */
 	protected function __construct() {
 		parent::__construct();
@@ -102,8 +103,8 @@ class WPSEO_Taxonomy_Meta extends WPSEO_Option {
 		self::$name = $this->option_name;
 
 		/* On succesfull update/add of the option, flush the W3TC cache. */
-		add_action( 'add_option_' . $this->option_name, [ 'WPSEO_Utils', 'flush_w3tc_cache' ] );
-		add_action( 'update_option_' . $this->option_name, [ 'WPSEO_Utils', 'flush_w3tc_cache' ] );
+		add_action( 'add_option_' . $this->option_name, array( 'WPSEO_Utils', 'flush_w3tc_cache' ) );
+		add_action( 'update_option_' . $this->option_name, array( 'WPSEO_Utils', 'flush_w3tc_cache' ) );
 	}
 
 	/**
@@ -124,7 +125,7 @@ class WPSEO_Taxonomy_Meta extends WPSEO_Option {
 	 * Add extra default options received from a filter.
 	 */
 	public function enrich_defaults() {
-		$extra_defaults_per_term = apply_filters( 'wpseo_add_extra_taxmeta_term_defaults', [] );
+		$extra_defaults_per_term = apply_filters( 'wpseo_add_extra_taxmeta_term_defaults', array() );
 		if ( is_array( $extra_defaults_per_term ) ) {
 			self::$defaults_per_term = array_merge( $extra_defaults_per_term, self::$defaults_per_term );
 		}
@@ -206,7 +207,7 @@ class WPSEO_Taxonomy_Meta extends WPSEO_Option {
 
 		foreach ( $dirty as $taxonomy => $terms ) {
 			/* Don't validate taxonomy - may not be registered yet and we don't want to remove valid ones. */
-			if ( is_array( $terms ) && $terms !== [] ) {
+			if ( is_array( $terms ) && $terms !== array() ) {
 				foreach ( $terms as $term_id => $meta_data ) {
 					/* Only validate term if the taxonomy exists. */
 					if ( taxonomy_exists( $taxonomy ) && get_term_by( 'id', $term_id, $taxonomy ) === false ) {
@@ -217,11 +218,11 @@ class WPSEO_Taxonomy_Meta extends WPSEO_Option {
 						continue;
 					}
 
-					if ( is_array( $meta_data ) && $meta_data !== [] ) {
+					if ( is_array( $meta_data ) && $meta_data !== array() ) {
 						/* Validate meta data. */
 						$old_meta  = self::get_term_meta( $term_id, $taxonomy );
 						$meta_data = self::validate_term_meta_data( $meta_data, $old_meta );
-						if ( $meta_data !== [] ) {
+						if ( $meta_data !== array() ) {
 							$clean[ $taxonomy ][ $term_id ] = $meta_data;
 						}
 					}
@@ -248,9 +249,9 @@ class WPSEO_Taxonomy_Meta extends WPSEO_Option {
 	public static function validate_term_meta_data( $meta_data, $old_meta ) {
 
 		$clean     = self::$defaults_per_term;
-		$meta_data = array_map( [ 'WPSEO_Utils', 'trim_recursive' ], $meta_data );
+		$meta_data = array_map( array( 'WPSEO_Utils', 'trim_recursive' ), $meta_data );
 
-		if ( ! is_array( $meta_data ) || $meta_data === [] ) {
+		if ( ! is_array( $meta_data ) || $meta_data === array() ) {
 			return $clean;
 		}
 
@@ -293,7 +294,7 @@ class WPSEO_Taxonomy_Meta extends WPSEO_Option {
 					if ( isset( $meta_data[ $key ] ) && is_string( $meta_data[ $key ] ) ) {
 						// The data is stringified JSON. Use `json_decode` and `json_encode` around the sanitation.
 						$input         = json_decode( $meta_data[ $key ], true );
-						$sanitized     = array_map( [ 'WPSEO_Utils', 'sanitize_text_field' ], $input );
+						$sanitized     = array_map( array( 'WPSEO_Utils', 'sanitize_text_field' ), $input );
 						$clean[ $key ] = WPSEO_Utils::format_json_encode( $sanitized );
 					}
 					elseif ( isset( $old_meta[ $key ] ) ) {
@@ -308,12 +309,12 @@ class WPSEO_Taxonomy_Meta extends WPSEO_Option {
 						$input = json_decode( $meta_data[ $key ], true );
 
 						// This data has two known keys: `keyword` and `score`.
-						$sanitized = [];
+						$sanitized = array();
 						foreach ( $input as $entry ) {
-							$sanitized[] = [
+							$sanitized[] = array(
 								'keyword' => WPSEO_Utils::sanitize_text_field( $entry['keyword'] ),
 								'score'   => WPSEO_Utils::sanitize_text_field( $entry['score'] ),
-							];
+							);
 						}
 
 						$clean[ $key ] = WPSEO_Utils::format_json_encode( $sanitized );
@@ -333,15 +334,15 @@ class WPSEO_Taxonomy_Meta extends WPSEO_Option {
 						$clean[ $key ] = WPSEO_Utils::sanitize_text_field( $meta_data[ $key ] );
 					}
 
-					if ( $key === 'wpseo_focuskw' ) {
-						$search = [
+					if ( 'wpseo_focuskw' === $key ) {
+						$search = array(
 							'&lt;',
 							'&gt;',
 							'&#96',
 							'<',
 							'>',
 							'`',
-						];
+						);
 
 						$clean[ $key ] = str_replace( $search, '', $clean[ $key ] );
 					}
@@ -372,14 +373,14 @@ class WPSEO_Taxonomy_Meta extends WPSEO_Option {
 	protected function clean_option( $option_value, $current_version = null, $all_old_option_values = null ) {
 
 		/* Clean up old values and remove empty arrays. */
-		if ( is_array( $option_value ) && $option_value !== [] ) {
+		if ( is_array( $option_value ) && $option_value !== array() ) {
 
 			foreach ( $option_value as $taxonomy => $terms ) {
 
-				if ( is_array( $terms ) && $terms !== [] ) {
+				if ( is_array( $terms ) && $terms !== array() ) {
 
 					foreach ( $terms as $term_id => $meta_data ) {
-						if ( ! is_array( $meta_data ) || $meta_data === [] ) {
+						if ( ! is_array( $meta_data ) || $meta_data === array() ) {
 							// Remove empty term arrays.
 							unset( $option_value[ $taxonomy ][ $term_id ] );
 						}
@@ -519,7 +520,7 @@ class WPSEO_Taxonomy_Meta extends WPSEO_Option {
 			$meta_key = 'wpseo_' . $meta_key;
 		}
 
-		self::set_values( $term_id, $taxonomy, [ $meta_key => $meta_value ] );
+		self::set_values( $term_id, $taxonomy, array( $meta_key => $meta_value ) );
 	}
 
 	/**
@@ -535,7 +536,7 @@ class WPSEO_Taxonomy_Meta extends WPSEO_Option {
 		$tax_meta = self::get_tax_meta();
 
 
-		$found = [];
+		$found = array();
 		// @todo Check for terms of all taxonomies, not only the current taxonomy.
 		foreach ( $tax_meta as $taxonomy_name => $terms ) {
 			foreach ( $terms as $term_id => $meta_values ) {
@@ -546,7 +547,7 @@ class WPSEO_Taxonomy_Meta extends WPSEO_Option {
 			}
 		}
 
-		return [ $keyword => $found ];
+		return array( $keyword => $found );
 	}
 
 	/**
@@ -560,12 +561,12 @@ class WPSEO_Taxonomy_Meta extends WPSEO_Option {
 		$tax_meta = self::get_tax_meta();
 
 		/* Add/remove the result to/from the original option value. */
-		if ( $clean !== [] ) {
+		if ( $clean !== array() ) {
 			$tax_meta[ $taxonomy ][ $term_id ] = $clean;
 		}
 		else {
 			unset( $tax_meta[ $taxonomy ][ $term_id ] );
-			if ( isset( $tax_meta[ $taxonomy ] ) && $tax_meta[ $taxonomy ] === [] ) {
+			if ( isset( $tax_meta[ $taxonomy ] ) && $tax_meta[ $taxonomy ] === array() ) {
 				unset( $tax_meta[ $taxonomy ] );
 			}
 		}

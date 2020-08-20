@@ -156,16 +156,14 @@ abstract class WPSEO_Plugin_Importer {
 	protected function detect() {
 		global $wpdb;
 
-		$meta_keys = wp_list_pluck( $this->clone_keys, 'old_key' );
-		$result    = $wpdb->get_var(
+		$meta_keys    = wp_list_pluck( $this->clone_keys, 'old_key' );
+		$placeholders = implode( ', ', array_fill( 0, count( $meta_keys ), '%s' ) );
+		$result       = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT(*) AS `count`
-					FROM {$wpdb->postmeta}
-					WHERE meta_key IN ( " . implode( ', ', array_fill( 0, count( $meta_keys ), '%s' ) ) . ' )',
+				"SELECT COUNT(*) AS `count` FROM {$wpdb->postmeta} WHERE meta_key IN ( $placeholders )",
 				$meta_keys
 			)
 		);
-
 		if ( $result === '0' ) {
 			return false;
 		}
@@ -182,7 +180,7 @@ abstract class WPSEO_Plugin_Importer {
 	 *
 	 * @return bool Clone status.
 	 */
-	protected function meta_key_clone( $old_key, $new_key, $replace_values = [] ) {
+	protected function meta_key_clone( $old_key, $new_key, $replace_values = array() ) {
 		global $wpdb;
 
 		// First we create a temp table with all the values for meta_key.
@@ -239,7 +237,7 @@ abstract class WPSEO_Plugin_Importer {
 	 */
 	protected function meta_keys_clone( $clone_keys ) {
 		foreach ( $clone_keys as $clone_key ) {
-			$result = $this->meta_key_clone( $clone_key['old_key'], $clone_key['new_key'], isset( $clone_key['convert'] ) ? $clone_key['convert'] : [] );
+			$result = $this->meta_key_clone( $clone_key['old_key'], $clone_key['new_key'], isset( $clone_key['convert'] ) ? $clone_key['convert'] : array() );
 			if ( ! $result ) {
 				return false;
 			}
@@ -309,7 +307,7 @@ abstract class WPSEO_Plugin_Importer {
 		global $wpdb;
 
 		// Now we replace values if needed.
-		if ( is_array( $replace_values ) && $replace_values !== [] ) {
+		if ( is_array( $replace_values ) && $replace_values !== array() ) {
 			foreach ( $replace_values as $old_value => $new_value ) {
 				$wpdb->query(
 					$wpdb->prepare(

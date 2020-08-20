@@ -2,25 +2,32 @@
 /**
  * Yoast extension of the Model class.
  *
- * @package Yoast\WP\SEO\Repositories
+ * @package Yoast\YoastSEO\ORM\Repositories
  */
 
-namespace Yoast\WP\SEO\Repositories;
+namespace Yoast\WP\Free\Repositories;
 
-use Yoast\WP\Lib\Model;
-use Yoast\WP\Lib\ORM;
+use Yoast\WP\Free\ORM\ORMWrapper;
+use Yoast\WP\Free\ORM\Yoast_Model;
 
 /**
  * Class SEO_Links_Repository
+ *
+ * WARNING: This class merely exists for type hints and dependency injection.
+ * Instances of this class will actually be instances of ORMWrapper and any functions and/or methods here will not be represented.
+ *
+ * @package Yoast\WP\Free\ORM\Repositories
  */
-class SEO_Links_Repository {
+class SEO_Links_Repository extends ORMWrapper {
 
 	/**
-	 * Starts a query for this repository.
+	 * Returns the instance of this class constructed through the ORM Wrapper.
 	 *
-	 * @return ORM
+	 * @return \Yoast\WP\Free\Repositories\SEO_Links_Repository
 	 */
-	public function query() {
-		return Model::of_type( 'SEO_Links' );
+	public static function get_instance() {
+		ORMWrapper::$repositories[ Yoast_Model::get_table_name( 'SEO_Links' ) ] = self::class;
+
+		return Yoast_Model::of_type( 'SEO_Links' );
 	}
 }

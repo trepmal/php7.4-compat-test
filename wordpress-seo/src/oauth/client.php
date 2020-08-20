@@ -2,16 +2,15 @@
 /**
  * Yoast extension of the Model class.
  *
- * @package Yoast\WP\SEO\Oauth
+ * @package Yoast\WP\Free\Oauth
  */
 
-namespace Yoast\WP\SEO\Oauth;
+namespace Yoast\WP\Free\Oauth;
 
 use WPSEO_Options;
 use WPSEO_Utils;
 use YoastSEO_Vendor\League\OAuth2\Client\Provider\GenericProvider;
 use YoastSEO_Vendor\League\OAuth2\Client\Token\AccessToken;
-use YoastSEO_Vendor\League\OAuth2\Client\Token\AccessTokenInterface;
 
 /**
  * Represents the oAuth client.
@@ -28,7 +27,7 @@ class Client {
 	/**
 	 * Contains the set access tokens.
 	 *
-	 * @var AccessTokenInterface[]
+	 * @var \YoastSEO_Vendor\League\OAuth2\Client\Token\AccessTokenInterface[]
 	 */
 	private $access_tokens;
 
@@ -56,7 +55,7 @@ class Client {
 	 *
 	 * @codeCoverageIgnore
 	 *
-	 * @return Client Instance of this class.
+	 * @return \Yoast\WP\Free\Oauth\Client Instance of this class.
 	 */
 	public static function get_instance() {
 		if ( static::$instance === null ) {
@@ -125,8 +124,8 @@ class Client {
 	/**
 	 * Saves the access token for the given user.
 	 *
-	 * @param int                  $user_id      User ID to receive token for.
-	 * @param AccessTokenInterface $access_token The access token to save.
+	 * @param int                                                              $user_id      User ID to receive token for.
+	 * @param \YoastSEO_Vendor\League\OAuth2\Client\Token\AccessTokenInterface $access_token The access token to save.
 	 *
 	 * @return void
 	 */
@@ -140,7 +139,7 @@ class Client {
 	 *
 	 * @param null|int $user_id User ID to receive token for.
 	 *
-	 * @return bool|AccessTokenInterface False if not found. Token when found.
+	 * @return bool|\YoastSEO_Vendor\League\OAuth2\Client\Token\AccessTokenInterface False if not found. Token when found.
 	 */
 	public function get_access_token( $user_id = null ) {
 		if ( $user_id === null ) {
@@ -174,7 +173,7 @@ class Client {
 	/**
 	 * Returns an instance of the oAuth provider.
 	 *
-	 * @return GenericProvider The provider.
+	 * @return \YoastSEO_Vendor\League\OAuth2\Client\Provider\GenericProvider The provider.
 	 */
 	public function get_provider() {
 		return new GenericProvider(
@@ -194,7 +193,7 @@ class Client {
 	 *
 	 * @param array $access_tokens The access tokens to format.
 	 *
-	 * @return AccessTokenInterface[] The formatted access tokens.
+	 * @return \YoastSEO_Vendor\League\OAuth2\Client\Token\AccessTokenInterface[] The formatted access tokens.
 	 */
 	protected function format_access_tokens( $access_tokens ) {
 		if ( ! \is_array( $access_tokens ) || $access_tokens === [] ) {
